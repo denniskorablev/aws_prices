@@ -56,9 +56,20 @@ for (i in 1:length(aws_regions)) {
     aws_prices <- rbind(aws_prices,aws_info_full)
 }
 colnames(aws_prices)[8:9] <- c('OS','USD')
-aws_prices_df <- as.data.frame(aws_prices)
+head(aws_prices)
+aws_prices_df <- data.frame(
+    region=as.character(aws_prices[,1]),
+    type=as.character(aws_prices[,2]),
+    size=as.character(aws_prices[,3]),
+    vCPU=as.double(aws_prices[,4]),
+    ECU=as.character(aws_prices[,5]),
+    memoryGiB=as.double(aws_prices[,6]),
+    storageGB = as.character(aws_prices[,7]),
+    OS = as.character(aws_prices[,8]),
+    USD = as.double(aws_prices[,9])
+    )
 
 #our final data object
 head(aws_prices_df)
-
+range(na.omit(aws_prices_df$USD)) #price range per hour
 
