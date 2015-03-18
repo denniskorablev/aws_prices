@@ -40,6 +40,8 @@ for (i in 1:length(aws_regions)) {
     aws_prices <- rbind(aws_prices,aws_info_full)
 }
 
+#our final data object
+head(aws_prices)
 
 
 
