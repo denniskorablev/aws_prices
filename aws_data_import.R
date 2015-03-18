@@ -7,11 +7,9 @@
 if (!'RJSONIO' %in% installed.packages()) install.packages('RJSONIO')
 library('RJSONIO') 
 
-# url with some information about project in Andalussia
-#url <- 'http://a0.awsstatic.com/pricing/1/ec2/linux-od.min.js'
-url <- 'linux-od.min.js'
 
 # read url and convert to data.frame
+url <- 'http://a0.awsstatic.com/pricing/1/ec2/linux-od.min.js'
 data_code <- readLines(url)
 data_code_cleaned <- data_code[6]
 data_code_cleaned <- gsub('([a-zA-Z_0-9\\.]*\\()|(\\);?$)',"", data_code_cleaned, perl = TRUE) #eliminate function call
@@ -59,7 +57,6 @@ for (i in 1:length(aws_regions)) {
 }
 colnames(aws_prices)[8:9] <- c('OS','USD')
 aws_prices_df <- as.data.frame(aws_prices)
-na.omit(aws_prices_df)
 
 #our final data object
 head(aws_prices_df)
