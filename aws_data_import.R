@@ -20,25 +20,43 @@ data <- (fromJSON(data_code_cleaned))
 
 #extract AWS information from the JSON
 aws_columns <- data$config$valueColumns
-aws_regions <- data$config$regions$region
+
+#extract list of regions from JSON
+aws_regions <- {}
+for (i in 1:length(data$config$regions)) {
+    aws_regions <- c(aws_regions,data$config$regions[[i]]$region)
+}
 
 #create table with regions, specifications and prices
-aws_prices <- {}
+aws_prices <- {} 
 for (i in 1:length(aws_regions)) {
-    aws_regions_data <- data$config$regions$instanceTypes[i]
-    aws_types <- aws_regions_data[[1]]$type
-    aws_sizes <- aws_regions_data[[1]]$sizes
-    n <- length(aws_sizes)
+    aws_regions_data <- data$config$regions[[i]]$instanceTypes #extract data for specific region
+    aws_sizes <- aws_regions_data[[i]]$sizes # extract data for different server sizes 
+    n_sizes <- length(aws_sizes) #store number of server sizes
+    
+    # extract server types
+    aws_types <- {} 
+    for (j in 1:length(aws_regions_data)) {
+        aws_types <- c(aws_types,aws_regions_data[[j]]$type)
+    }
+    n_types <- length(aws_types) # store number of server types
+    
+    #extract detailed server info
     aws_info <- {}
-    for (j in 1:n) {
-        temp_aws <- cbind(Type=aws_types[j],aws_regions_data[[1]]$sizes[[j]])
+    
+    for (j in 1:n_types) { #loop for server types
+        aws_sizes <- aws_regions_data[[j]]$sizes
+        aws_info_for_region_and_size <- {}
+        for (k in 1:length(aws_sizes)) { #loop for server sizes
+            aws_info_for_region_and_size <- rbind(aws_info_for_region_and_size,unlist(aws_regions_data[[j]]$sizes[k]))
+        }
+        temp_aws <- cbind(type=aws_types[j],aws_info_for_region_and_size)
         aws_info <- rbind(aws_info,temp_aws)
     }
-    name_price <- data.frame(matrix(unlist(aws_info[,dim(aws_info)[2]]),nrow=dim(aws_info)[1],byrow=TRUE))
-    names(name_price) <- c('name','prices.USD')
-    aws_info_full <- cbind(region=aws_regions[i],aws_info[,-dim(aws_info)[2]],name_price)
+    aws_info_full <- cbind(region=aws_regions[i],aws_info)
     aws_prices <- rbind(aws_prices,aws_info_full)
 }
+colnames(aws_prices)[8:9] <- c('OS','USD')
 
 #our final data object
 head(aws_prices)
